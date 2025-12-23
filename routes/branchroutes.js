@@ -13,7 +13,7 @@ const branchRouter = express.Router();
 branchRouter.post("/add-provience", isLogin, authorizeRoles("admin"), addProvience);
 branchRouter.get("/get-provience", getALLProvience);
 branchRouter.post("/add-district",isLogin,authorizeRoles("admin"),  addDistrict);
-branchRouter.get("/get-district",getAllDistricts);
+branchRouter.get("/get-district/:provience_id",getAllDistricts);
 branchRouter.post("/add-branch",addBranch);
 branchRouter.get("/get-branch",getAllBranches);
 

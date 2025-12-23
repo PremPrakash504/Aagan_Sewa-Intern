@@ -39,7 +39,7 @@ export const getAllservices = async (req, res) => {
   try {
     const [rows] = await db.query(
       
-        "SELECT  s.service_name, s.description,s.branch_id,branch_name FROM services s LEFT JOIN branch b ON s.branch_id=b.branch_id ",
+        "SELECT  * FROM services ",
     );
         res.status(200).json({
     message:"Successfully retrived all services",

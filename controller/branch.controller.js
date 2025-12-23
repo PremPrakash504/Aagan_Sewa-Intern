@@ -24,17 +24,9 @@ export const addProvience = async (req, res) => {
 // get all provience
 export const getALLProvience = async (req, res) => {
   try {
-    const [rows] = await db.query(`
-   SELECT
-    p.provience_id,
-    p.provience_name,
-    GROUP_CONCAT(d.district_name) as district
-    
-    FROM provience p
-    LEFT JOIN district d
-      ON p.provience_id= d.provience_id
-      GROUP BY p.provience_id, p.provience_name
-      `);
+    const [rows] = await db.query(
+    "SELECT *FROM provience"
+    );
     res.status(201).json({
       message: "Successfully retrived all provience name",
       data: rows,
@@ -54,6 +46,7 @@ export const addDistrict = async (req, res) => {
     if (existingProvience.length === 0) {
       return res.status(400).json({ message: "Provience doesnot exist" });
     }
+    
     const [existingDistrict] = await db.query(
       "SELECT *FROM district WHERE district_name=?",
       [district_name]
@@ -73,18 +66,26 @@ export const addDistrict = async (req, res) => {
     console.log(error);
   }
 };
-// get all district
+// get district
 export const getAllDistricts = async (req, res) => {
   try {
-    const [rows] = await db.query("Select* FROM district");
+    const { provience_id } = req.params;
+
+    const [rows] = await db.query(
+      "SELECT district_id, district_name FROM district WHERE provience_id = ?",
+      [provience_id]
+    );
+
     res.status(200).json({
-      mesage: "Successfully retrived all districts",
+      message: "Successfully retrieved districts by provience",
       data: rows,
     });
   } catch (error) {
-    console.log("Failed to get all data");
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
 // add branch
 export const addBranch = async (req, res) => {
   try {
@@ -109,7 +110,7 @@ export const addBranch = async (req, res) => {
 export const getAllBranches = async (req, res) => {
   try {
     const [rows] = await db.query(
-      "SELECT d.district_name,b.branch_id,b.branch_name,b.remarks FROM branch b LEFT JOIN district d ON b.branch_id = d.district_id"
+      "SELECT* FROM branch"
     );
     res.status(200).json({
       message: "Successfully retrived all branch name",
