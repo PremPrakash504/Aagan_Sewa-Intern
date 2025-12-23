@@ -1,8 +1,9 @@
 import express from "express";
-import { addStaff } from "../controller/staff.controller.js";
-
+import {addStaff, getStaff} from "../controller/staff.controller.js";
+import { isLogin } from "../middlewares/login.js";
+import { authorizeRoles } from "../middlewares/isAuth.js";
 
 const staffRouter = express.Router();
-staffRouter.post("/add-staff",addStaff);
+staffRouter.post("/add-staff",isLogin,authorizeRoles("manager"),addStaff);
 
 export default staffRouter;

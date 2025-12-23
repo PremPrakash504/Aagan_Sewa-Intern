@@ -1,5 +1,5 @@
 import express from "express";
-import { addService, deleteService, getAllservices } from "../controller/servicecontroller.js";
+import { addService, deleteService, getAllservices } from "../controller/service.controller.js";
 import { serviceImgUpload } from "../utils/multerHandler.js";
 
 const serviceRouter = express.Router();

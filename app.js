@@ -4,16 +4,17 @@ import db from "./config/db.connect.js";
 import branchRouter from "./routes/branchroutes.js";
 import serviceRouter from "./routes/serviceroutes.js";
 import staffRouter from "./routes/staffroutes.js";
+import authRouter from "./routes/authroutes.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use("/api/branch", branchRouter);
-app.use("/api/services",serviceRouter);
-app.use("/api/staff",staffRouter);
-app.get("/api/me", (req, res) => {
-  res.send("Hello"); // Browser/Postman मा "Hello" देखिन्छ
-});
+app.use("/api/services", serviceRouter);
+app.use("/api/staff", staffRouter);
+app.use("/api/auth", authRouter);
 
 const PORT = process.env.PORT || 4000;
 try {

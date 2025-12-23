@@ -66,57 +66,57 @@ export const addDistrict = async (req, res) => {
       [district_name, provience_id]
     );
     res.status(201).json({
-      message:"District added successfully",
-    })
+      message: "District added successfully",
+    });
     console.log(req.body);
   } catch (error) {
     console.log(error);
   }
 };
 // get all district
-export const getAllDistricts = async (req, res)=>{
-  try{
- const[rows] = await db.query("Select* FROM district");
- res.status(200).json({
-  mesage:"Successfully retrived all districts",
-  data:rows,
-  });
-  }catch(error){
+export const getAllDistricts = async (req, res) => {
+  try {
+    const [rows] = await db.query("Select* FROM district");
+    res.status(200).json({
+      mesage: "Successfully retrived all districts",
+      data: rows,
+    });
+  } catch (error) {
     console.log("Failed to get all data");
   }
 };
 // add branch
-export const addBranch = async(req, res)=>{
-  try{
-  const{branch_name,remarks,district_id} = req.body;
-  const[existingDistrict] = await db.query(
-    "SELECT * FROM district WHERE district_id=?",
-    [district_id]
-  );
-  if(existingDistrict.length==0){
-    return res.status(400).json({message:"District does not exist"});
+export const addBranch = async (req, res) => {
+  try {
+    const { branch_name, remarks, district_id } = req.body;
+    const [existingDistrict] = await db.query(
+      "SELECT * FROM district WHERE district_id=?",
+      [district_id]
+    );
+    if (existingDistrict.length == 0) {
+      return res.status(400).json({ message: "District does not exist" });
+    }
+    await db.query(
+      "INSERT INTO branch(branch_name,remarks,district_id) VALUES(?,?,?)",
+      [branch_name, remarks, district_id]
+    );
+    res.status(201).json({ message: "Branch added Successfully" });
+  } catch (error) {
+    console.log("error", error);
   }
-  await db.query(
-   "INSERT INTO branch(branch_name,remarks,district_id) VALUES(?,?,?)",
-   [branch_name,remarks,district_id] 
-  );
-  res.status(201).json({message:"Branch added Successfully"});
-}catch(error){
-  console.log("error",error)
-}
 };
 // get all branch
-export const getAllBranches = async(req,res)=>{
- try{
-  const[rows] = await db.query(
-    "SELECT d.district_name,b.branch_id,b.branch_name,b.remarks FROM branch b LEFT JOIN district d ON b.branch_id=d.district_id"
-  );
-  res.status(200).json({
-    message:"Successfully retrived all branch name",
-    data:rows,
-  });
- } catch(error){
-  console.log(error);
-  res.status(500).json({message:"Internal server error"})
- }
+export const getAllBranches = async (req, res) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT d.district_name,b.branch_id,b.branch_name,b.remarks FROM branch b LEFT JOIN district d ON b.branch_id = d.district_id"
+    );
+    res.status(200).json({
+      message: "Successfully retrived all branch name",
+      data: rows,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
