@@ -36,21 +36,34 @@ export const addService = async (req, res) => {
 };
 // get services
 export const getAllservices = async (req, res) => {
+  
   try {
-    const [rows] = await db.query(
-      
-        "SELECT  * FROM services ",
-    );
-        res.status(200).json({
-    message:"Successfully retrived all services",
-    data:rows,
-  });
-    
+    const{provience_id, district_id, branch_id} = req.query;
+    let query = "";
+    let params = [];
+    if(provience_id && !district_id && !branch_id){
+      // get district based on provience_id
+      query="SELECT * FROM district WHERE provience_id=?";
+      params=[provience_id];
+    }else if(provience_id && district_id && !branch_id){
+      // get branches based on district id
+      query="SELECT* FROM branch WHERE district_id=?";
+      params=[district_id];
+    }else if(provience_id && district_id && branch_id){
+      // get services based on branchid
+      query="SELECT * FROM services WHERE branch_id=?";
+      params=[branch_id];
+    }else{
+      query="SELECT * FROM services";
+    }
+    const[results] = await db.query(query, params);
+    return res.status(200).json({message:"Successfully retrives service",data:results})
+
   } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: "server error" });
+    console.log(error)
   }
 };
+
 
 //delete service controller
  export const deleteService = async (req, res) => {

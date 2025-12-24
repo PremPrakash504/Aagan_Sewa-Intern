@@ -97,6 +97,13 @@ export const addBranch = async (req, res) => {
     if (existingDistrict.length == 0) {
       return res.status(400).json({ message: "District does not exist" });
     }
+    const [existingbranch]= await db.query(
+      "SELECT* FROM branch WHERE branch_id=?",[branch_name]
+    );
+    if(existingbranch>0){
+      return res.status(400).json({message:"This branch already exists"})
+    }
+    
     await db.query(
       "INSERT INTO branch(branch_name,remarks,district_id) VALUES(?,?,?)",
       [branch_name, remarks, district_id]

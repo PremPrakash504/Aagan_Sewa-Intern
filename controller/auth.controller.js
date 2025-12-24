@@ -12,6 +12,7 @@ export const authLogin = async (req, res) => {
         .status(400)
         .json({ message: "email and password are required" });
     }
+    console.log(email)
     // Comment 2: Fetch user by email from the database
     const [user] = await db.query("SELECT* FROM users WHERE email=?", [email]);
     console.log(user);
