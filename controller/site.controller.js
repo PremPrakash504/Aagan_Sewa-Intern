@@ -91,4 +91,18 @@ export const getReview = async (req, res) => {
     console.log(error);
   }
 };
-
+// add trusted customer
+export const addTrustedCustomer = async(req, res) =>{
+  try {
+    const{name} = req.bpody;
+    const tCustomerImg = req.file;
+    if(!name || !tCustomerImg){
+      res.status(400).json({message:"Please fill all fields"})
+    }
+    const tCustomerImgPath = tCustomerImg? tCustomerImg.path : null;
+    await db.query("INSERT INTO trusted_Customer(name, trusted_Customer_img) VALUES (?,?)", [name, tCustomerImg])
+    res.response(200).json({message:"Trusted customer added successfully"});
+  } catch (error) {
+    console.log(error);
+  }
+}

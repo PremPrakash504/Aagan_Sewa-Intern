@@ -76,3 +76,8 @@ CREATE TABLE review(
     FOREIGN KEY (branch_id) REFERENCES branch(branch_id)
 );
 
+CREATE TABLE trusted_Customer(
+    trusted_Cuatomer_id INT AUTO INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    trusted_Customer_image VARCHAR(255) NOT NULL
+);
