@@ -77,7 +77,7 @@ CREATE TABLE review(
 );
 
 CREATE TABLE trusted_Customer(
-    trusted_Cuatomer_id INT AUTO INCREMENT PRIMARY KEY,
+    trusted_Customer_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     trusted_Customer_image VARCHAR(255) NOT NULL
 );

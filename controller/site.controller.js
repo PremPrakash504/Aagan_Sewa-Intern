@@ -51,7 +51,7 @@ export const addReview = async (req, res) => {
     if (!name || !star || !description || !branch_id) {
       return res.status(401).json({ message: "please fill all credentials" });
     }
-    
+
     const [branchExists] = await db.query(
       "SELECT branch_id FROM branch WHERE branch_id = ?",
       [branch_id]
@@ -59,7 +59,7 @@ export const addReview = async (req, res) => {
     if (branchExists.length === 0) {
       return res.status(404).json({ message: "Branch does not exist" });
     }
-    
+
     await db.query(
       "INSERT INTO review( name,star ,description ,branch_id) values (?,?,?,?) ",
       [name, star, description, branch_id]
@@ -92,17 +92,27 @@ export const getReview = async (req, res) => {
   }
 };
 // add trusted customer
-export const addTrustedCustomer = async(req, res) =>{
+export const addTrustedCustomer = async (req, res) => {
   try {
-    const{name} = req.bpody;
+    const { name } = req.body;
     const tCustomerImg = req.file;
-    if(!name || !tCustomerImg){
-      res.status(400).json({message:"Please fill all fields"})
+
+    if (!name || !tCustomerImg) {
+      return res.status(400).json({ message: "Please fill all fields" });
     }
-    const tCustomerImgPath = tCustomerImg? tCustomerImg.path : null;
-    await db.query("INSERT INTO trusted_Customer(name, trusted_Customer_img) VALUES (?,?)", [name, tCustomerImg])
-    res.response(200).json({message:"Trusted customer added successfully"});
+
+    // image ko filename ya path matrai save garne
+    const tCustomerImgPath = tCustomerImg.filename; 
+    // or: tCustomerImg.path
+
+    await db.query(
+      "INSERT INTO trusted_Customer (name, trusted_Customer_image) VALUES (?, ?)",
+      [name, tCustomerImgPath]
+    );
+
+    res.status(200).json({ message: "Trusted customer added successfully" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
-}
+};
