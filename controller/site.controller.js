@@ -100,11 +100,7 @@ export const addTrustedCustomer = async (req, res) => {
     if (!name || !tCustomerImg) {
       return res.status(400).json({ message: "Please fill all fields" });
     }
-
-    // image ko filename ya path matrai save garne
-    const tCustomerImgPath = tCustomerImg.filename; 
-    // or: tCustomerImg.path
-
+    const tCustomerImgPath = tCustomerImg.filename;
     await db.query(
       "INSERT INTO trusted_Customer (name, trusted_Customer_image) VALUES (?, ?)",
       [name, tCustomerImgPath]
@@ -113,6 +109,68 @@ export const addTrustedCustomer = async (req, res) => {
     res.status(200).json({ message: "Trusted customer added successfully" });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// get trusted customer
+export const getTrustedCustomer = async (req, res) => {
+  try {
+    const [row] = await db.query("SELECT * FROM trusted_Customer");
+    res
+      .status(200)
+      .json({ message: "Successfully retrived trusted customer", data: row });
+  } catch (error) {
+    console.log(error);
+  }
+};
+//  add gallary
+export const addGallery = async (req, res) => {
+  try {
+    const { title, branch_id } = req.body;
+    const images = req.files;
+
+    if (!title || !branch_id) {
+      return res.status(400).json({ message: "Title and branch_id required" });
+    }
+
+    if (!images || images.length === 0) {
+      return res.status(400).json({ message: "Images required" });
+    }
+
+    const [branch] = await db.query("SELECT * FROM branch WHERE branch_id=?", [
+      branch_id,
+    ]);
+
+    if (branch.length === 0) {
+      return res.status(404).json({ message: "Branch not found" });
+    }
+
+    const uploadedBy = req.user.id;
+    const userRole = req.user.role;
+    const userBranchId = req.user.branch_id;
+
+    if (userRole === "branch_manager") {
+      if (parseInt(branch_id) !== userBranchId) {
+        return res.status(403).json({
+          message:
+            "Branch managers can upload gallery only for their own branch",
+        });
+      }
+    }
+
+    for (let img of images) {
+      await db.query(
+        `INSERT INTO gallery (title, image_path, branch_id, uploaded_by)
+         VALUES (?,?,?,?)`,
+        [title, img.path, branch_id, uploadedBy]
+      );
+    }
+
+    return res.status(201).json({
+      message: "Gallery images uploaded successfully",
+    });
+  } catch (error) {
+    console.log("Gallery upload error", error);
     res.status(500).json({ message: "Server error" });
   }
 };

@@ -81,3 +81,16 @@ CREATE TABLE trusted_Customer(
     name VARCHAR(100) NOT NULL,
     trusted_Customer_image VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE gallery (
+    gallery_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    branch_id INT NOT NULL,
+    uploaded_by INT NOT NULL,
+
+    FOREIGN KEY (branch_id) REFERENCES branch(branch_id),
+    FOREIGN KEY (uploaded_by) REFERENCES users(user_id)
+);

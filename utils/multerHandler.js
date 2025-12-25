@@ -21,3 +21,12 @@ const tcustomerStorage = multer.diskStorage({
 export const tcustomerImgUpload = multer({
   storage: tcustomerStorage, 
 });
+// gallary storage
+const galleries = multer.diskStorage({
+  destination: "uploads/gallary",
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + "-" + file.originalname);
+  }, 
+})
+export const Galleries = multer({storage:galleries});
