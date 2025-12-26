@@ -10,11 +10,26 @@ import {
   getALLProvience,
 } from "../controller/branch.controller.js";
 const branchRouter = express.Router();
-branchRouter.post("/add-provience", isLogin, authorizeRoles("admin"), addProvience);
+branchRouter.post(
+  "/add-provience",
+  isLogin,
+  authorizeRoles("admin"),
+  addProvience
+);
 branchRouter.get("/get-provience", getALLProvience);
-branchRouter.post("/add-district",isLogin,authorizeRoles("admin"),  addDistrict);
-branchRouter.get("/get-district/:provience_id",getAllDistricts);
-branchRouter.post("/add-branch",isLogin,authorizeRoles("admin,branch_manager"),addBranch);
-branchRouter.get("/get-branch",getAllBranches);
+branchRouter.post(
+  "/add-district",
+  isLogin,
+  authorizeRoles("admin"),
+  addDistrict
+);
+branchRouter.get("/get-district/:provience_id", getAllDistricts);
+branchRouter.post(
+  "/add-branch",
+  isLogin,
+  authorizeRoles("admin", "branch_manager"),
+  addBranch
+);
+branchRouter.get("/get-branch", getAllBranches);
 
 export default branchRouter;

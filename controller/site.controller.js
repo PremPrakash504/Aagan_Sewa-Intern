@@ -216,29 +216,45 @@ export const getGallery = async (req, res) => {
 // get all gallery
 export const getAllGallery = async (req, res) => {
   try {
-    const { province_id, district_id, branch_id } = req.query;
+    let { provience_id, district_id, branch_id } = req.query;
+
+    // empty string -> null
+    district_id = district_id || null;
+    branch_id = branch_id || null;
+
     let query = "";
     let params = [];
 
-    if (province_id && !district_id && !branch_id) {
-      query = "SELECT * FROM district WHERE province_id = ?";
-      params = [province_id];
+    // Province selected → return districts
+    if (provience_id && !district_id && !branch_id) {
+      query = "SELECT * FROM district WHERE provience_id = ?";
+      params = [provience_id];
 
-    } else if (province_id && district_id && !branch_id) {
+      // Province + District selected → return branches
+    } else if (provience_id && district_id && !branch_id) {
       query = "SELECT * FROM branch WHERE district_id = ?";
       params = [district_id];
 
-    } else if (province_id && district_id && branch_id) {
+      // Province + District + Branch selected → return gallery
+    } else if (provience_id && district_id && branch_id) {
       query = `
-        SELECT g.gallery_id, g.title, g.image_path, b.branch_name
+        SELECT 
+          g.gallery_id,
+          g.title,
+          g.image_path,
+          g.created_at,
+          g.uploaded_by,
+          b.branch_name
         FROM gallery g
         LEFT JOIN branch b ON g.branch_id = b.branch_id
         WHERE g.branch_id = ?
+        ORDER BY g.gallery_id DESC
       `;
       params = [branch_id];
-
     } else {
-      query = "SELECT * FROM gallery";
+      return res.status(400).json({
+        message: "Invalid query parameters",
+      });
     }
 
     const [results] = await db.query(query, params);
@@ -248,7 +264,7 @@ export const getAllGallery = async (req, res) => {
       data: results,
     });
   } catch (error) {
-    console.log(error);
+    console.log("Get all gallery error:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
