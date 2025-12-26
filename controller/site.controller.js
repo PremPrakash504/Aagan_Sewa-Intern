@@ -174,3 +174,81 @@ export const addGallery = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+// get gallery on role based
+export const getGallery = async (req, res) => {
+  try {
+    const { role, branch_id: userBranchId } = req.user;
+
+    let query = `
+      SELECT
+        g.gallery_id,
+        g.title,
+        g.image_path,
+        g.branch_id,
+        b.branch_name,
+        g.uploaded_by
+      FROM gallery g
+      LEFT JOIN branch b
+        ON g.branch_id = b.branch_id
+    `;
+
+    const params = [];
+
+    // branch manager restriction
+    if (role === "branch_manager") {
+      query += " WHERE g.branch_id = ?";
+      params.push(userBranchId);
+    }
+
+    query += " ORDER BY g.gallery_id DESC";
+
+    const [rows] = await db.query(query, params);
+
+    res.status(200).json({
+      message: "Gallery fetched successfully",
+      data: rows,
+    });
+  } catch (error) {
+    console.log("Get gallery error", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// get all gallery
+export const getAllGallery = async (req, res) => {
+  try {
+    const { province_id, district_id, branch_id } = req.query;
+    let query = "";
+    let params = [];
+
+    if (province_id && !district_id && !branch_id) {
+      query = "SELECT * FROM district WHERE province_id = ?";
+      params = [province_id];
+
+    } else if (province_id && district_id && !branch_id) {
+      query = "SELECT * FROM branch WHERE district_id = ?";
+      params = [district_id];
+
+    } else if (province_id && district_id && branch_id) {
+      query = `
+        SELECT g.gallery_id, g.title, g.image_path, b.branch_name
+        FROM gallery g
+        LEFT JOIN branch b ON g.branch_id = b.branch_id
+        WHERE g.branch_id = ?
+      `;
+      params = [branch_id];
+
+    } else {
+      query = "SELECT * FROM gallery";
+    }
+
+    const [results] = await db.query(query, params);
+
+    res.status(200).json({
+      message: "Gallery data fetched successfully",
+      data: results,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
