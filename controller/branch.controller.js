@@ -71,6 +71,8 @@ export const deleteProvience = async (req, res) => {
 };
 
 
+
+
 // add district
 export const addDistrict = async (req, res) => {
   try {
@@ -121,7 +123,39 @@ export const getAllDistricts = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+// delete district
+export const deleteDistrict = async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const [existingDistrict] = await db.query(
+      "SELECT district_id FROM district WHERE district_id = ?",
+      [id]
+    );
+
+    if (existingDistrict.length === 0) {
+      return res.status(404).json({
+        message: "District does not exist",
+      });
+    }
+
+    
+    const [result] = await db.query(
+      "DELETE FROM district WHERE district_id = ?",
+      [id]
+    );
+
+    
+    res.status(200).json({
+      message: `District deleted successfully with id ${id}`,
+    });
+  } catch (error) {
+    console.error("Failed to delete district", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 // add branch
 export const addBranch = async (req, res) => {
   try {
@@ -149,14 +183,27 @@ export const addBranch = async (req, res) => {
     console.log("error", error);
   }
 };
-// get all branch
+// get branch by district
 export const getAllBranches = async (req, res) => {
-  try {
+   try {
+    const { district_id } = req.params;
+
     const [rows] = await db.query(
-      "SELECT* FROM branch"
+      `SELECT 
+         b.branch_id,
+         b.branch_name,
+         b.address,
+         b.phone,
+         d.district_id,
+         d.district_name
+       FROM branch b
+       JOIN district d ON b.district_id = d.district_id
+       WHERE b.district_id = ?`,
+      [district_id]
     );
+
     res.status(200).json({
-      message: "Successfully retrived all branch name",
+      message: "Successfully retrieved branches by district",
       data: rows,
     });
   } catch (error) {
@@ -164,3 +211,38 @@ export const getAllBranches = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+// delete branch
+export const deleteBranch = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [existingBranch] = await db.query(
+      "SELECT branch_id FROM branch WHERE branch_id = ?",
+      [id]
+    );
+
+    if (existingBranch.length === 0) {
+      return res.status(404).json({
+        message: "Branch does not exist",
+      });
+    }
+
+    
+    const [result] = await db.query(
+      "DELETE FROM branch WHERE branch_id = ?",
+      [id]
+    );
+
+    
+    res.status(200).json({
+      message: `Branch deleted successfully with id ${id}`,
+    });
+  } catch (error) {
+    console.error("Failed to delete branch", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+
