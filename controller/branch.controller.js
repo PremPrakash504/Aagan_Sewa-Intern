@@ -35,6 +35,42 @@ export const getALLProvience = async (req, res) => {
     console.error("Failed to get all data", error);
   }
 };
+
+// delete provience
+export const deleteProvience = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [existingProvience] = await db.query(
+      "SELECT provience_id FROM provience WHERE provience_id = ?",
+      [id]
+    );
+
+    if (existingProvience.length === 0) {
+      return res.status(404).json({
+        message: "Provience does not exist",
+      });
+    }
+
+    
+    const [result] = await db.query(
+      "DELETE FROM provience WHERE provience_id = ?",
+      [id]
+    );
+
+    
+    res.status(200).json({
+      message: `Provience deleted successfully with id ${id}`,
+    });
+  } catch (error) {
+    console.error("Failed to delete provience", error);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+
 // add district
 export const addDistrict = async (req, res) => {
   try {
