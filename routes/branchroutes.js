@@ -10,6 +10,7 @@ import {
   getAllBranches,
   getAllDistricts,
   getALLProvience,
+  updateBranch,
 } from "../controller/branch.controller.js";
 const branchRouter = express.Router();
 branchRouter.post(
@@ -26,14 +27,15 @@ branchRouter.post(
   addDistrict
 );
 branchRouter.get("/get-district/:provience_id", getAllDistricts);
-branchRouter.delete("/delete-district/:district_id",deleteDistrict);
+branchRouter.delete("/delete-district/:district_id",isLogin,authorizeRoles("admin") ,deleteDistrict);
 branchRouter.post(
   "/add-branch",
   isLogin,
-  authorizeRoles("admin", "branch_manager"),
+  authorizeRoles("admin"),
   addBranch
 );
 branchRouter.get("/get-branch", getAllBranches);
-branchRouter.delete("/delete-branch/:branch_id",deleteBranch);
+branchRouter.delete("/delete-branch/:branch_id",isLogin,authorizeRoles("admin"),deleteBranch);
+branchRouter.patch("/update-branch/:id",isLogin,authorizeRoles("admin"),updateBranch);
 
 export default branchRouter;

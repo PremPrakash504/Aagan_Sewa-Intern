@@ -244,5 +244,62 @@ export const deleteBranch = async (req, res) => {
     });
   }
 };
+// update branch
+export const updateBranch = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { branch_name, district_id, remarks } = req.body;
 
+    const [existing] = await db.execute(
+      "SELECT * FROM branch WHERE branch_id = ?",
+      [id]
+    );
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        message: `Branch not found with id ${id}`,
+      });
+    }
+
+    const oldbranch = existing[0];
+    const updatedBranchName = branch_name || oldbranch.branch_name;
+    const updatedDistrictId = district_id || oldbranch.district_id;
+    const updatedRemarks = remarks || oldbranch.remarks;
+
+    if (district_id && district_id !== oldbranch.district_id) {
+      const [districtExists] = await db.execute(
+        "SELECT district_id FROM district WHERE district_id = ?",
+        [district_id]
+      );
+      if (districtExists.length === 0) {
+        return res.status(404).json({ message: "District does not exist" });
+      }
+    }
+
+    if (branch_name && branch_name !== oldbranch.branch_name) {
+      const [nameCheck] = await db.execute(
+        "SELECT branch_id FROM branch WHERE branch_name = ? AND branch_id != ?",
+        [branch_name, id]
+      );
+      if (nameCheck.length > 0) {
+        return res.status(409).json({
+          message: "Branch name already exists",
+        });
+      }
+    }
+
+    await db.execute(
+      `UPDATE branch 
+       SET branch_name = ?, district_id = ?, remarks = ?
+       WHERE branch_id = ?`,
+      [updatedBranchName, updatedDistrictId, updatedRemarks, id]
+    );
+
+    return res.status(200).json({
+      message: "Branch updated successfully",
+    });
+  } catch (error) {
+   console.log("Server error",error);
+  }
+};
 

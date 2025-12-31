@@ -44,6 +44,42 @@ LEFT JOIN branch b
     console.log(error);
   }
 };
+// delete inquery
+export const deleteInquiry = async (req, res) => {
+  try {
+    const { inquiry_id } = req.params;
+    const managerBranchId = req.user.branch_id;
+
+    if (!inquiry_id) {
+      return res.status(400).json({ message: "Inquiry id required" });
+    }
+    const [inquiry] = await db.query(
+      "SELECT * FROM inquiry WHERE inquiry_id=?",
+      [inquiry_id]
+    );
+
+    if (inquiry.length === 0) {
+      return res.status(404).json({ message: "Inquiry not found" });
+    }
+    if (inquiry[0].branch_id !== managerBranchId) {
+      return res
+        .status(403)
+        .json({ message: "You can delete only your branch inquiries" });
+    }
+    await db.query(
+      "DELETE FROM inquiry WHERE inquiry_id=?",
+      [inquiry_id]
+    );
+
+    return res.status(200).json({
+      message: "Inquiry deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // add review
 export const addReview = async (req, res) => {
   try {

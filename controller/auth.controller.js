@@ -6,16 +6,14 @@ import db from "../config/db.connect.js";
 export const authLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // Comment 1: Validate required credentials
+
     if (!email || !password) {
       return res
         .status(400)
         .json({ message: "email and password are required" });
     }
-    console.log(email)
-    // Comment 2: Fetch user by email from the database
+
     const [user] = await db.query("SELECT* FROM users WHERE email=?", [email]);
-    console.log(user);
 
     if (user.length == 0) {
       return res.status(400).json({ message: "user not available" });
@@ -46,7 +44,12 @@ export const authLogin = async (req, res) => {
     });
     res.status(200).json({
       message: "Login Successful",
-      user,
+      user: {
+        email: userData.email,
+        id: userData.user_id,
+        role: userData.role,
+        branch_id: userData.branch_id,
+      },
     });
   } catch (error) {
     console.log(error);
@@ -55,9 +58,10 @@ export const authLogin = async (req, res) => {
 export const signout = async (req, res) => {
   try {
     res.clearCookie("token");
-    res.status.json({ message: "signout successfull" });
+    res.status(200).json({ message: "signout successfull" });
   } catch (error) {
-    return res.status(400).json({ message: "server error", error });
+    res.status(400).json({ message: "server error", error });
+
   }
 };
 export const addBranchManager = async (req, res) => {

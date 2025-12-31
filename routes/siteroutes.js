@@ -4,6 +4,7 @@ import {
   addInquiry,
   addReview,
   addTrustedCustomer,
+  deleteInquiry,
   getAllGallery,
   getGallery,
   getInquiry,
@@ -16,11 +17,12 @@ import { authorizeRoles } from "../middlewares/isAuth.js";
 
 const siteRouter = express.Router();
 siteRouter.post("/add-inquiry", addInquiry);
-siteRouter.get("/get-inquiry", getInquiry);
+siteRouter.get("/get-inquiry",isLogin,authorizeRoles("admin","branch_manager"), getInquiry);
+siteRouter.delete("/delete-inquery",isLogin,authorizeRoles("admin","branch_manager"),deleteInquiry);
 siteRouter.post("/add-review", addReview);
 siteRouter.get("/get-review", getReview);
 siteRouter.post(
-  "/add-trustedCustomer",
+  "/add-trustedCustomer", isLogin, authorizeRoles("admin","branch_manager"),
   tcustomerImgUpload.single("tCustomerImg"),
   addTrustedCustomer
 );
