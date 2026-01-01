@@ -24,9 +24,7 @@ export const addProvience = async (req, res) => {
 // get all provience
 export const getALLProvience = async (req, res) => {
   try {
-    const [rows] = await db.query(
-    "SELECT *FROM provience"
-    );
+    const [rows] = await db.query("SELECT *FROM provience");
     res.status(201).json({
       message: "Successfully retrived all provience name",
       data: rows,
@@ -52,13 +50,11 @@ export const deleteProvience = async (req, res) => {
       });
     }
 
-    
     const [result] = await db.query(
       "DELETE FROM provience WHERE provience_id = ?",
       [id]
     );
 
-    
     res.status(200).json({
       message: `Provience deleted successfully with id ${id}`,
     });
@@ -69,9 +65,6 @@ export const deleteProvience = async (req, res) => {
     });
   }
 };
-
-
-
 
 // add district
 export const addDistrict = async (req, res) => {
@@ -84,7 +77,7 @@ export const addDistrict = async (req, res) => {
     if (existingProvience.length === 0) {
       return res.status(400).json({ message: "Provience doesnot exist" });
     }
-    
+
     const [existingDistrict] = await db.query(
       "SELECT *FROM district WHERE district_name=?",
       [district_name]
@@ -107,20 +100,13 @@ export const addDistrict = async (req, res) => {
 // get district
 export const getAllDistricts = async (req, res) => {
   try {
-    const { provience_id } = req.params;
-
-    const [rows] = await db.query(
-      "SELECT district_id, district_name FROM district WHERE provience_id = ?",
-      [provience_id]
-    );
-
+    const [rows] = await db.query("SELECT * FROM district");
     res.status(200).json({
-      message: "Successfully retrieved districts by provience",
+      message: "Sucesssfully retrieved all districts",
       data: rows,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Failed to get all data", error);
   }
 };
 // delete district
@@ -139,13 +125,11 @@ export const deleteDistrict = async (req, res) => {
       });
     }
 
-    
     const [result] = await db.query(
       "DELETE FROM district WHERE district_id = ?",
       [id]
     );
 
-    
     res.status(200).json({
       message: `District deleted successfully with id ${id}`,
     });
@@ -167,13 +151,14 @@ export const addBranch = async (req, res) => {
     if (existingDistrict.length == 0) {
       return res.status(400).json({ message: "District does not exist" });
     }
-    const [existingbranch]= await db.query(
-      "SELECT* FROM branch WHERE branch_id=?",[branch_name]
+    const [existingbranch] = await db.query(
+      "SELECT* FROM branch WHERE branch_id=?",
+      [branch_name]
     );
-    if(existingbranch>0){
-      return res.status(400).json({message:"This branch already exists"})
+    if (existingbranch > 0) {
+      return res.status(400).json({ message: "This branch already exists" });
     }
-    
+
     await db.query(
       "INSERT INTO branch(branch_name,remarks,district_id) VALUES(?,?,?)",
       [branch_name, remarks, district_id]
@@ -185,29 +170,16 @@ export const addBranch = async (req, res) => {
 };
 // get branch by district
 export const getAllBranches = async (req, res) => {
-   try {
-    const { district_id } = req.params;
-
+  try {
     const [rows] = await db.query(
-      `SELECT 
-         b.branch_id,
-         b.branch_name,
-         b.address,
-         b.phone,
-         d.district_id,
-         d.district_name
-       FROM branch b
-       JOIN district d ON b.district_id = d.district_id
-       WHERE b.district_id = ?`,
-      [district_id]
+      "SELECT d.district_name,b.branch_id,b.branch_name,b.remarks FROM branch b LEFT JOIN district d ON b.district_id=d.district_id"
     );
-
     res.status(200).json({
-      message: "Successfully retrieved branches by district",
+      message: "sucessfully retrieved all branch name",
       data: rows,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -227,13 +199,10 @@ export const deleteBranch = async (req, res) => {
       });
     }
 
-    
-    const [result] = await db.query(
-      "DELETE FROM branch WHERE branch_id = ?",
-      [id]
-    );
+    const [result] = await db.query("DELETE FROM branch WHERE branch_id = ?", [
+      id,
+    ]);
 
-    
     res.status(200).json({
       message: `Branch deleted successfully with id ${id}`,
     });
@@ -299,7 +268,6 @@ export const updateBranch = async (req, res) => {
       message: "Branch updated successfully",
     });
   } catch (error) {
-   console.log("Server error",error);
+    console.log("Server error", error);
   }
 };
-

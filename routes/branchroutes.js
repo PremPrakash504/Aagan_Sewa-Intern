@@ -26,7 +26,7 @@ branchRouter.post(
   authorizeRoles("admin"),
   addDistrict
 );
-branchRouter.get("/get-district/:provience_id", getAllDistricts);
+branchRouter.get("/get-district", getAllDistricts);
 branchRouter.delete("/delete-district/:district_id",isLogin,authorizeRoles("admin") ,deleteDistrict);
 branchRouter.post(
   "/add-branch",
